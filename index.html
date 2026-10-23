@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>ジャグラー分析レポート</title>
-  <meta name="theme-color" content="#05070d">
+  <meta name="theme-color" content="#080c14">
   
   <!-- PWA 設定 -->
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/192/1055/1055687.png">
 
   <!-- スタイル & フォント -->
@@ -15,7 +15,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Chango&family=Alfa+Slab+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Alfa+Slab+One&display=swap" rel="stylesheet">
   
   <style>
     body {
@@ -27,21 +27,9 @@
 
     /* 実機風 GOGO! ランプ バッジ */
     .gogo-lamp-badge {
-      background: radial-gradient(circle, #1a0815 0%, #050206 100%);
-      border: 1.5px solid #2e1026;
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.9), 0 0 12px rgba(255, 0, 100, 0.25);
-    }
-
-    /* ギザギザ星形プレートのバックシャドウ */
-    .gogo-star-shape {
-      clip-path: polygon(
-        50% 0%, 63% 28%, 98% 20%, 78% 48%, 100% 70%, 
-        68% 74%, 60% 100%, 42% 78%, 15% 95%, 28% 64%, 
-        0% 45%, 32% 34%, 22% 5%
-      );
-      background: radial-gradient(circle, #ffe600 0%, #ff0055 70%, #99002b 100%);
-      filter: drop-shadow(0 0 8px #ff0055) drop-shadow(0 0 16px #ff0033);
-      animation: lampGlow 2.5s infinite alternate ease-in-out;
+      background: radial-gradient(circle, #24091c 0%, #050206 100%);
+      border: 1.5px solid #3d1430;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.9), 0 0 14px rgba(255, 0, 85, 0.35);
     }
 
     /* GOGO! ネオン文字 */
@@ -52,9 +40,9 @@
       text-shadow: 
         0 0 3px #ffffff,
         0 0 8px #ffea00,
-        0 0 18px #ff0055,
-        0 0 30px #ff0055,
-        0 0 45px #cc0033;
+        0 0 16px #ff0055,
+        0 0 28px #ff0055,
+        0 0 40px #cc0033;
       transform: skew(-6deg);
     }
 
@@ -65,31 +53,18 @@
       color: #ffffff;
       text-shadow: 0 0 4px #ff0055, 0 0 8px #ff0055;
     }
-
-    @keyframes lampGlow {
-      0%, 100% {
-        filter: drop-shadow(0 0 6px #ff0055) drop-shadow(0 0 14px #ff0033);
-        opacity: 0.96;
-      }
-      50% {
-        filter: drop-shadow(0 0 12px #ff2a6d) drop-shadow(0 0 25px #ff0055);
-        opacity: 1;
-      }
-    }
   </style>
 </head>
 <body class="pb-24">
 
   <!-- ヘッダー -->
-  <header class="bg-gray-950/95 backdrop-blur border-b border-gray-800/80 px-3 py-2 sticky top-0 z-30 flex justify-between items-center shadow-2xl">
+  <header class="bg-gray-950/95 backdrop-blur border-b border-gray-800 px-3 py-2 sticky top-0 z-30 flex justify-between items-center shadow-2xl">
     
-    <!-- GOGO! ランプ風ロゴエリア -->
+    <!-- GOGO! CHANCE ランプ風ロゴ -->
     <div class="flex items-center gap-2">
-      <div class="gogo-lamp-badge px-3 py-1.5 rounded-xl flex flex-col items-center justify-center relative overflow-hidden">
-        <div class="flex items-baseline leading-none">
-          <span class="gogo-text text-base sm:text-lg font-black select-none">GOGO!</span>
-        </div>
-        <span class="chance-text uppercase font-black leading-none mt-0.5 select-none">CHANCE</span>
+      <div class="gogo-lamp-badge px-3 py-1.5 rounded-xl flex flex-col items-center justify-center select-none">
+        <span class="gogo-text text-base sm:text-lg font-black leading-none">GOGO!</span>
+        <span class="chance-text uppercase font-black leading-none mt-0.5">CHANCE</span>
       </div>
       <span class="text-xs text-gray-400 font-bold tracking-wider ml-1 border-l border-gray-800 pl-2">分析レポート</span>
     </div>
@@ -250,13 +225,13 @@
     // PWA Service Worker 登録
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js', { scope: './' })
-          .then(reg => console.log('SW Registered', reg))
-          .catch(err => console.error('SW Error', err));
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker 登録成功:', reg))
+          .catch(err => console.error('Service Worker 登録失敗:', err));
       });
     }
 
-    // 初回デフォルト記録
+    // 初回データ
     const defaultData = [{
       id: 1,
       date: '2026-10-23',
