@@ -4,30 +4,68 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ジャグラー分析レポート</title>
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#0b0f19">
   
-  <!-- PWA アプリ化設定 -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22%E3%82%B8%E3%83%A3%E3%82%B0%E3%83%A9%E3%83%BC%E5%88%86%E6%9E%90%22%2C%22short_name%22%3A%22%E3%82%B8%E3%83%A3%E3%82%B0%E3%83%A9%E3%83%BC%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23111827%22%2C%22theme_color%22%3A%22%23111827%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fapi.iconify.design%2Fsolar%3Achart-bold.svg%3Fcolor%3D%2523f59e0b%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+  <!-- PWA 設定ファイル連携 -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="https://api.iconify.design/solar:chart-bold.svg?color=%23f59e0b">
 
+  <!-- UI & フォント -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&family=Chango&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800;900&family=Chango&display=swap" rel="stylesheet">
+  
   <style>
-    body { font-family: 'M PLUS Rounded 1c', sans-serif; background-color: #0b0f19; color: #f3f4f6; }
-    .gogo-font { font-family: 'Chango', cursive; }
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background-color: #0b0f19;
+      color: #f3f4f6;
+    }
+    
+    /* GOGO! CHANCE ネオン発光エフェクト */
+    .neon-gogo {
+      font-family: 'Chango', cursive;
+      color: #ff2a6d;
+      letter-spacing: -0.5px;
+      text-shadow:
+        0 0 4px #ff2a6d,
+        0 0 10px #ff2a6d,
+        0 0 20px #ff0055,
+        0 0 40px #ff0055,
+        0 0 60px #b0003a;
+      animation: neonFlicker 3s infinite alternate;
+    }
+
+    @keyframes neonFlicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow:
+          0 0 4px #ff2a6d,
+          0 0 10px #ff2a6d,
+          0 0 20px #ff0055,
+          0 0 40px #ff0055,
+          0 0 60px #b0003a;
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        text-shadow: none;
+        opacity: 0.85;
+      }
+    }
   </style>
 </head>
 <body class="pb-24">
 
   <!-- ヘッダー -->
-  <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-30 flex justify-between items-center">
+  <header class="bg-gray-950/90 backdrop-blur border-b border-gray-800 p-3.5 sticky top-0 z-30 flex justify-between items-center shadow-lg">
     <div class="flex items-center gap-2">
-      <span class="text-rose-500 text-xl font-black italic tracking-tighter gogo-font">GOGO!</span>
-      <h1 class="text-lg font-bold text-white">ジャグラー分析</h1>
+      <span class="neon-gogo text-base sm:text-lg font-black italic select-none">GOGO! CHANCE</span>
+      <span class="text-xs text-gray-400 font-bold tracking-wider ml-1 border-l border-gray-700 pl-2">分析レポート</span>
     </div>
     <div class="flex gap-2">
-      <button onclick="exportData()" class="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs font-bold text-amber-400">保存</button>
-      <label class="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-xs font-bold text-blue-400 cursor-pointer">
+      <button onclick="exportData()" class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 hover:border-amber-400 rounded-lg text-xs font-bold text-amber-400 transition-colors shadow">保存</button>
+      <label class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 hover:border-blue-400 rounded-lg text-xs font-bold text-blue-400 cursor-pointer transition-colors shadow">
         復元<input type="file" onchange="importData(event)" class="hidden" accept=".json">
       </label>
     </div>
@@ -36,22 +74,23 @@
   <!-- メインコンテンツ -->
   <main class="max-w-md mx-auto p-4 space-y-6">
 
-    <!-- 入力セクション -->
-    <section id="sec-input" class="space-y-4">
+    <!-- 入力フォーム -->
+    <section class="space-y-4">
       <div class="bg-gray-900/90 border border-gray-800 rounded-2xl p-4 shadow-xl">
-        <h2 class="text-base font-bold text-amber-400 mb-3 flex items-center gap-2">
-          <span>●</span> 実戦記録の追加
+        <h2 class="text-sm font-bold text-amber-400 mb-3 flex items-center gap-1.5">
+          <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          本日の実戦を記録
         </h2>
         
         <form id="recordForm" onsubmit="handleSave(event)" class="space-y-3">
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-400">日付</label>
-              <input type="date" id="date" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400 font-bold">日付</label>
+              <input type="date" id="date" required class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
             </div>
             <div>
-              <label class="text-xs text-gray-400">機種</label>
-              <select id="model" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400 font-bold">機種名</label>
+              <select id="model" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-2.5 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
                 <option value="マイジャグラーV">マイジャグラーV</option>
                 <option value="アイムジャグラーEX">アイムジャグラーEX</option>
                 <option value="ファンキージャグラー2">ファンキージャグラー2</option>
@@ -63,24 +102,24 @@
           </div>
 
           <div>
-            <label class="text-xs text-gray-400">ホール・店舗名</label>
-            <input type="text" id="hall" required placeholder="モナコパレス菊陽" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+            <label class="text-[11px] text-gray-400 font-bold">ホール・店舗名</label>
+            <input type="text" id="hall" required placeholder="モナコパレス菊陽" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
           </div>
 
           <!-- G数・ボーナス -->
-          <div class="bg-gray-800/50 p-3 rounded-xl space-y-2 border border-gray-700/50">
+          <div class="bg-gray-800/40 p-3 rounded-xl space-y-2 border border-gray-700/50">
             <div class="grid grid-cols-3 gap-2">
               <div>
-                <label class="text-xs text-gray-400">総回転数</label>
-                <input type="number" id="games" placeholder="591" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-sm text-white text-center">
+                <label class="text-[10px] text-gray-400 block text-center">総回転数</label>
+                <input type="number" id="games" placeholder="591" class="w-full bg-gray-900 border border-gray-700 rounded-lg py-1.5 text-xs text-white text-center font-bold focus:border-rose-500">
               </div>
               <div>
-                <label class="text-xs text-rose-400 font-bold">BIG回数</label>
-                <input type="number" id="big" placeholder="6" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-sm text-white text-center">
+                <label class="text-[10px] text-rose-400 block text-center font-bold">BIG</label>
+                <input type="number" id="big" placeholder="6" class="w-full bg-gray-900 border border-gray-700 rounded-lg py-1.5 text-xs text-white text-center font-bold focus:border-rose-500">
               </div>
               <div>
-                <label class="text-xs text-amber-400 font-bold">REG回数</label>
-                <input type="number" id="reg" placeholder="2" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-1.5 text-sm text-white text-center">
+                <label class="text-[10px] text-amber-400 block text-center font-bold">REG</label>
+                <input type="number" id="reg" placeholder="2" class="w-full bg-gray-900 border border-gray-700 rounded-lg py-1.5 text-xs text-white text-center font-bold focus:border-rose-500">
               </div>
             </div>
           </div>
@@ -88,52 +127,56 @@
           <!-- 着席時状況 -->
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-400">着席時ハマり (G)</label>
-              <input type="number" id="startHamari" placeholder="435" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400">着席時ハマり (G)</label>
+              <input type="number" id="startHamari" placeholder="435" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
             <div>
-              <label class="text-xs text-gray-400">着席時差枚 (枚)</label>
-              <input type="number" id="startDiff" placeholder="-1400" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400">着席時差枚 (枚)</label>
+              <input type="number" id="startDiff" placeholder="-1400" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
           </div>
 
           <!-- 投資・回収 -->
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="text-xs text-gray-400">投資 (円)</label>
-              <input type="number" id="invest" required placeholder="5000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400">投資 (円)</label>
+              <input type="number" id="invest" required placeholder="5000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
             <div>
-              <label class="text-xs text-gray-400">回収 (円)</label>
-              <input type="number" id="collect" required placeholder="25000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-sm text-white">
+              <label class="text-[11px] text-gray-400">回収 (円)</label>
+              <input type="number" id="collect" required placeholder="25000" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-3 rounded-xl shadow-lg mt-2">
+          <button type="submit" class="w-full bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 text-white font-bold py-3 rounded-xl shadow-lg mt-2 text-sm tracking-wide active:scale-[0.99] transition-transform">
             実戦記録を保存する
           </button>
         </form>
       </div>
     </section>
 
-    <!-- レポートセクション -->
-    <section id="sec-report" class="space-y-4">
-      <div class="flex justify-between items-center">
-        <h2 class="text-lg font-black text-white">ジャグラー分析レポート</h2>
-        <span class="text-xs text-gray-400" id="reportCount">0件の記録</span>
+    <!-- レポートエリア（3部構成） -->
+    <section class="space-y-4">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-base font-bold text-white tracking-wide">ジャグラー分析レポート</h2>
+        <span class="text-xs text-gray-400" id="reportCount">0件</span>
       </div>
 
-      <!-- PART 1: 実戦サマリー -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3">
-        <h3 class="text-xs font-bold text-rose-400 tracking-wider">1. 直近の実戦サマリー</h3>
-        <div id="latestSummary" class="text-sm space-y-2 text-gray-300">
+      <!-- 1. 実戦サマリー -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3 shadow-md">
+        <h3 class="text-xs font-bold text-rose-400 tracking-wider flex items-center gap-1.5">
+          <span>■</span> 1. 直近の実戦サマリー
+        </h3>
+        <div id="latestSummary" class="text-xs space-y-2 text-gray-300">
           データがありません
         </div>
       </div>
 
-      <!-- PART 2: 店舗別データ -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3">
-        <h3 class="text-xs font-bold text-amber-400 tracking-wider">2. 店舗別データ</h3>
+      <!-- 2. 店舗別データ -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3 shadow-md">
+        <h3 class="text-xs font-bold text-amber-400 tracking-wider flex items-center gap-1.5">
+          <span>■</span> 2. 店舗別データ
+        </h3>
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-left text-gray-300">
             <thead class="text-gray-400 border-b border-gray-800">
@@ -148,20 +191,22 @@
         </div>
       </div>
 
-      <!-- PART 3: 生涯収支推移 -->
-      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3">
-        <h3 class="text-xs font-bold text-emerald-400 tracking-wider">3. 生涯収支推移</h3>
-        <div class="grid grid-cols-2 gap-2 text-center py-2 bg-gray-800/40 rounded-xl">
+      <!-- 3. 生涯収支推移 -->
+      <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3 shadow-md">
+        <h3 class="text-xs font-bold text-emerald-400 tracking-wider flex items-center gap-1.5">
+          <span>■</span> 3. 生涯収支推移
+        </h3>
+        <div class="grid grid-cols-2 gap-2 text-center py-2.5 bg-gray-800/40 rounded-xl border border-gray-800">
           <div>
             <div class="text-[10px] text-gray-400">通算戦績</div>
-            <div class="text-sm font-bold text-white" id="totalRecord">0戦 0勝</div>
+            <div class="text-sm font-bold text-white mt-0.5" id="totalRecord">0戦 0勝</div>
           </div>
           <div>
             <div class="text-[10px] text-gray-400">生涯総収支</div>
-            <div class="text-base font-black" id="totalIncome">±0円</div>
+            <div class="text-base font-black mt-0.5" id="totalIncome">±0円</div>
           </div>
         </div>
-        <div class="h-48 pt-2">
+        <div class="h-44 pt-2">
           <canvas id="profitChart"></canvas>
         </div>
       </div>
@@ -170,14 +215,14 @@
   </main>
 
   <script>
-    // PWA インストールを可能にするダミー Service Worker の即時登録
+    // Service Worker 登録（PWAインストール対応）
     if ('serviceWorker' in navigator) {
-      const swCode = "self.addEventListener('fetch', () => {});";
-      const blob = new Blob([swCode], { type: 'application/javascript' });
-      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
     }
 
-    // 初回データ
+    // 初期サンプルデータ
     const defaultData = [{
       id: 1,
       date: '2026-10-23',
@@ -222,7 +267,7 @@
     }
 
     function render() {
-      document.getElementById('reportCount').textContent = records.length + '件の記録';
+      document.getElementById('reportCount').textContent = records.length + '件';
 
       // 1. 直近サマリー
       if (records.length > 0) {
@@ -236,18 +281,19 @@
         document.getElementById('latestSummary').innerHTML = `
           <div class="flex justify-between items-baseline border-b border-gray-800 pb-2">
             <div>
-              <span class="font-bold text-white text-base">${r.hall}</span>
-              <span class="text-xs text-gray-400 ml-1">(${r.model})</span>
+              <span class="font-bold text-white text-sm">${r.hall}</span>
+              <span class="text-[11px] text-gray-400 ml-1">(${r.model})</span>
             </div>
             <span class="font-bold text-sm ${isWin ? 'text-rose-400' : 'text-blue-400'}">${isWin ? '+' : ''}${r.diff.toLocaleString()}円</span>
           </div>
-          <div class="grid grid-cols-2 gap-y-1 text-xs text-gray-400 pt-1">
+          <div class="grid grid-cols-2 gap-y-1.5 text-xs text-gray-400 pt-1">
+            <div>日付: <span class="text-white">${r.date}</span></div>
             <div>総G数: <span class="text-white">${g}G</span></div>
-            <div>合算: <span class="text-amber-400 font-bold">1/${tProb}</span></div>
+            <div>合算確率: <span class="text-amber-400 font-bold">1/${tProb}</span></div>
             <div>BIG: <span class="text-white">${r.big}回 (1/${bProb})</span></div>
             <div>REG: <span class="text-white">${r.reg}回 (1/${rProb})</span></div>
             <div>着席時: <span class="text-white">${r.startHamari}G / ${r.startDiff}枚</span></div>
-            <div>投資/回収: <span class="text-white">${r.invest.toLocaleString()} / ${r.collect.toLocaleString()}円</span></div>
+            <div>投資 / 回収: <span class="text-white">${r.invest.toLocaleString()}円 / ${r.collect.toLocaleString()}円</span></div>
           </div>
         `;
       }
@@ -267,15 +313,15 @@
         const win = d.profit >= 0;
         tableHtml += `
           <tr class="border-b border-gray-800/60">
-            <td class="py-2 font-medium text-white">${hall}</td>
-            <td class="py-2 text-center">${d.wins}勝${d.total - d.wins}敗 (${rate}%)</td>
-            <td class="py-2 text-right font-bold ${win ? 'text-rose-400' : 'text-blue-400'}">${win ? '+' : ''}${d.profit.toLocaleString()}円</td>
+            <td class="py-2.5 font-medium text-white">${hall}</td>
+            <td class="py-2.5 text-center">${d.wins}勝${d.total - d.wins}敗 (${rate}%)</td>
+            <td class="py-2.5 text-right font-bold ${win ? 'text-rose-400' : 'text-blue-400'}">${win ? '+' : ''}${d.profit.toLocaleString()}円</td>
           </tr>
         `;
       }
       document.getElementById('hallStatsTable').innerHTML = tableHtml;
 
-      // 3. 生涯収支 & グラフ
+      // 3. 生涯収支推移
       let sum = 0;
       let wins = 0;
       const chronological = [...records].reverse();
@@ -293,7 +339,7 @@
       document.getElementById('totalRecord').textContent = `${records.length}戦 ${wins}勝 (${winRate}%)`;
       const totElem = document.getElementById('totalIncome');
       totElem.textContent = (sum >= 0 ? '+' : '') + sum.toLocaleString() + '円';
-      totElem.className = 'text-base font-black ' + (sum >= 0 ? 'text-rose-400' : 'text-blue-400');
+      totElem.className = 'text-base font-black mt-0.5 ' + (sum >= 0 ? 'text-rose-400' : 'text-blue-400');
 
       if (chartInstance) chartInstance.destroy();
       const ctx = document.getElementById('profitChart').getContext('2d');
@@ -303,12 +349,13 @@
           labels: labels,
           datasets: [{
             data: dataPoints,
-            borderColor: '#f43f5e',
-            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+            borderColor: '#ff2a6d',
+            backgroundColor: 'rgba(255, 42, 109, 0.12)',
             fill: true,
             tension: 0.3,
-            borderWidth: 2,
-            pointRadius: 3
+            borderWidth: 2.5,
+            pointRadius: 3,
+            pointBackgroundColor: '#ff2a6d'
           }]
         },
         options: {
